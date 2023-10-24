@@ -47,6 +47,13 @@ class LSTMLayer:
     
     def getOutput(self):
         return self.output
+    
+    def getOutputShape(self):
+        return (None, self.hidden_units)
+    
+    def getParamsCount(self):
+        per_gate = (self.input_shape * self.hidden_units) + (self.hidden_units * self.hidden_units) + self.hidden_units
+        return per_gate * 4
 
     def forgetGate(self):
         self.cell_state = self.cell_state * (sigmoid((self.Uf * self.input) + (self.Wf * self.output) + self.Bf))
