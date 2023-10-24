@@ -40,10 +40,10 @@ class DenseLayer:
         return self.output
     
     def getOutputShape(self):
-        return (1, self.units)
+        return (None, self.units)
     
     def getParamsCount(self):
-        return self.input_size * self.units
+        return self.input_size * self.units + self.units
     
     def getData(self):
         return {
