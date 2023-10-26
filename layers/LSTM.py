@@ -2,8 +2,8 @@ import numpy as np
 from utils.utils import sigmoid, tanh
 
 class LSTMLayer:
-    def __init__(self, hidden_units):
-        self.hidden_units = hidden_units
+    def __init__(self, units):
+        self.units = units
         
         self.input: np.ndarray = None
 
@@ -38,16 +38,34 @@ class LSTMLayer:
         return f"\nLSTM LAYER\n--------\nInput: {self.input}\n\nOutput: {self.output}\n"
 
     def __randomU(self):
-        return np.random.uniform(-self.bound, self.bound, (self.input_shape, self.hidden_units))
+        return np.random.uniform(-self.bound, self.bound, (self.input_shape, self.units))
     
     def __randomW(self):
-        return np.random.uniform(-self.bound, self.bound, (self.hidden_units, self.hidden_units))
+        return np.random.uniform(-self.bound, self.bound, (self.units, self.units))
 
     def __randomB(self):
-        return np.zeros((1, self.hidden_units))
+        return np.zeros((1, self.units))
     
     def setOutput(self, output):
         self.output = output
+        
+    def setRecurrentWeight(self, wf, wi, wc, wo):
+        self.Wf = wf
+        self.Wi = wi
+        self.Wc = wc
+        self.Wo = wo
+
+    def setWeight(self, uf, ui, uc, uo):
+        self.Uf = uf
+        self.Ui = ui
+        self.Uc = uc
+        self.Uo = uo
+
+    def setBias(self, bf, bi, bc, bo):
+        self.Bf = bf
+        self.Bi = bi
+        self.Bc = bc
+        self.Bo = bo
 
     def setInputSize(self, dimension):
         self.seq_length = dimension[0]
@@ -59,11 +77,11 @@ class LSTMLayer:
         self.seq_length = self.input.shape[0]
         self.input_shape = self.input.shape[1]
 
-        self.output: np.ndarray = np.zeros((1, self.hidden_units))
-        self.cell_state: np.ndarray = np.zeros((1, self.hidden_units))
+        self.output: np.ndarray = np.zeros((1, self.units))
+        self.cell_state: np.ndarray = np.zeros((1, self.units))
 
         # xavier (glorot) initialization for weights
-        self.bound = np.sqrt(6.0 / (self.input_shape + self.hidden_units))
+        self.bound = np.sqrt(6.0 / (self.input_shape + self.units))
         
         # weight for phases
         self.Uf = self.__randomU()
@@ -87,11 +105,34 @@ class LSTMLayer:
         return self.output
     
     def getOutputShape(self):
-        return (None, self.hidden_units)
+        return (None, self.units)
     
     def getParamsCount(self):
-        per_gate = (self.input_shape * self.hidden_units) + (self.hidden_units * self.hidden_units) + self.hidden_units
+        per_gate = (self.input_shape * self.units) + (self.units * self.units) + self.units
         return per_gate * 4
+    
+    def getData(self):
+        return {
+            "type": "lstm",
+            "params": {
+                "units": self.units,
+                # WEIGHT
+                "Uf": self.Uf.tolist(),
+                "Ui": self.Ui.tolist(),
+                "Uc": self.Uc.tolist(),
+                "Uo": self.Uo.tolist(),
+                # RECURRENT WEIGHT
+                "Wf": self.Wf.tolist(),
+                "Wi": self.Wi.tolist(),
+                "Wc": self.Wc.tolist(),
+                "Wo": self.Wo.tolist(),
+                # BIASES
+                "Bf": self.Bf.tolist(),
+                "Bi": self.Bi.tolist(),
+                "Bc": self.Bc.tolist(),
+                "Bo": self.Bo.tolist(),
+            }
+        }
 
     def forgetGate(self, input):
         self.cell_state = self.cell_state * (sigmoid(np.matmul(input, self.Uf) + np.matmul(self.output, self.Wf) + self.Bf))

@@ -1,4 +1,8 @@
 import numpy as np
+import json
+from enums.enums import ActivationFunction
+from layers.LSTM import LSTMLayer
+from layers.Dense import DenseLayer
 
 class Sequential():
     def __init__(self):
@@ -65,6 +69,62 @@ class Sequential():
         print("Trainable Params: {}".format(trainable_parameter))
         print("Non-trainable Params: {}".format(non_trainable_parameter))
         print()
+
+    def saveModel(self, filename):
+        file = open(f'./output/{filename}.json' , 'w')
+        data = []
+
+        for layer in self.layers:
+            data.append(layer.getData())
+
+        file.write(json.dumps(data, indent=4))
+        file.close()
+        print("MODEL SAVED")
+
+    def loadModel(self, filename):
+        file = open(f'./output/{filename}.json', 'r')
+
+        data = json.load(file)
+        file.close()
+
+        self.layers = []
+
+        # loop through the loaded data and reconstruct the layers
+        for layer_data in data:
+            layer_type = layer_data["type"]
+            
+            # Add LSTM layer
+            if layer_type == "lstm":
+                params = layer_data["params"]
+
+                lstmLayer = LSTMLayer(
+                    units=params["units"]
+                )
+
+                lstmLayer.setWeight(params["Uf"], params["Ui"], params["Uc"], params["Uo"])
+                lstmLayer.setRecurrentWeight(params["Wf"], params["Wi"], params["Wc"], params["Wo"])
+                lstmLayer.setBias(params["Bf"], params["Bi"], params["Bc"], params["Bo"])
+                self.add(lstmLayer)
+            
+            # Add dense layer
+            elif layer_type == "dense":
+                params = layer_data["params"]
+                activation_function = ActivationFunction.RELU
+
+                if (params["activation_function"] == "ActivationFunction.RELU"):
+                    activation_function = ActivationFunction.RELU
+                if (params["activation_function"] == "ActivationFunction.SIGMOID"):
+                    activation_function = ActivationFunction.SIGMOID
+
+                denseLayer = DenseLayer(
+                    units=params["units"],
+                    activation_function=activation_function,
+                )
+                denseLayer.setWeight(np.array(params["kernel"]))
+                denseLayer.setBiases(np.array(params["biases"]))
+                self.add(denseLayer)
+            
+        print("MODEL LOADED")
 
     def setInput(self, input):
         self.input = input

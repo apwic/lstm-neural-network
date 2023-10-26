@@ -1,4 +1,4 @@
-from enums.enums import ActivationFunction, DenseLayerType
+from enums.enums import ActivationFunction
 from utils.utils import relu, sigmoid
 import numpy as np
 
@@ -51,7 +51,6 @@ class DenseLayer:
             "params": {
                 "units": self.units,
                 "activation_function": str(self.activation_function),
-                "learning_rate": self.learning_rate,
                 "kernel": self.weights.tolist(),
                 "biases": self.biases.tolist()
             }
