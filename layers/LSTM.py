@@ -35,7 +35,7 @@ class LSTMLayer:
         self.Bo = None
 
     def __str__(self):
-        pass
+        return f"\nLSTM LAYER\n--------\nInput: {self.input}\n\nOutput: {self.output}\n"
 
     def __randomU(self):
         return np.random.uniform(-self.bound, self.bound, (self.input_shape, self.hidden_units))
@@ -93,22 +93,22 @@ class LSTMLayer:
         per_gate = (self.input_shape * self.hidden_units) + (self.hidden_units * self.hidden_units) + self.hidden_units
         return per_gate * 4
 
-    def forgetGate(self):
-        self.cell_state = self.cell_state * (sigmoid((self.Uf * self.input) + (self.Wf * self.output) + self.Bf))
+    def forgetGate(self, input):
+        self.cell_state = self.cell_state * (sigmoid(np.matmul(input, self.Uf) + np.matmul(self.output, self.Wf) + self.Bf))
     
-    def inputGate(self):
-        it = sigmoid((self.Ui * self.input) + (self.Wi * self.output) + self.Bi)
-        ct = tanh((self.Uc * self.input) + (self.Wc * self.output) + self.Bc)
+    def inputGate(self, input):
+        it = sigmoid(np.matmul(input, self.Ui) + np.matmul(self.output, self.Wf) + self.Bi)
+        ct = tanh(np.matmul(input, self.Uc) + np.matmul(self.output, self.Wc) + self.Bc)
 
         self.cell_state = self.cell_state + (it * ct)
 
-    def outputGate(self):
-        ot = sigmoid((self.Uo * self.input) + (self.Wo * self.output) + self.Bo)
+    def outputGate(self, input):
+        ot = sigmoid(np.matmul(input, self.Uo) + np.matmul(self.output, self.Wo) + self.Bo)
 
         self.output = ot * tanh(self.cell_state)
 
     def forward(self):
         for i in range(self.seq_length):
-            self.forgetGate()
-            self.inputGate()
-            self.outputGate()
+            self.forgetGate(self.input[i])
+            self.inputGate(self.input[i])
+            self.outputGate(self.input[i])

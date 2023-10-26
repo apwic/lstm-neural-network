@@ -17,6 +17,7 @@ def main():
     model.add(LSTMLayer(hidden_units=64))
     model.add(DenseLayer(units=5, activation_function=ActivationFunction.RELU))
     model.printSummary()
+    model.predict()
 
 if __name__ == '__main__':
     main()

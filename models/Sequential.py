@@ -92,4 +92,5 @@ class Sequential():
 
             layer.forward()
             self.output = layer.getOutput()
+            print(layer)
             i += 1
