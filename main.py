@@ -13,7 +13,7 @@ def main():
         [1,2,3,4,5]
     ])
 
-    input = getDataset('Test_stock_market.csv')
+    input = getDataset('Train_stock_market.csv')
 
     model = Sequential()
     model.setInput(input)
