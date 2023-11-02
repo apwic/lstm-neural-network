@@ -71,7 +71,7 @@ class LSTMLayer:
         self.seq_length = dimension[0]
         self.input_shape = dimension[1]
 
-    def setInput(self, input):
+    def setInput(self, input, isLoad=False):
         self.input = input
 
         self.seq_length = self.input.shape[0]
@@ -80,26 +80,27 @@ class LSTMLayer:
         self.output: np.ndarray = np.zeros((1, self.units))
         self.cell_state: np.ndarray = np.zeros((1, self.units))
 
-        # xavier (glorot) initialization for weights
-        self.bound = np.sqrt(6.0 / (self.input_shape + self.units))
-        
-        # weight for phases
-        self.Uf = self.__randomU()
-        self.Ui = self.__randomU()
-        self.Uc = self.__randomU()
-        self.Uo = self.__randomU()
-        
-        # recurrent weights for phases
-        self.Wf = self.__randomW()
-        self.Wi = self.__randomW()
-        self.Wc = self.__randomW()
-        self.Wo = self.__randomW()
+        if (not isLoad) :
+            # xavier (glorot) initialization for weights
+            self.bound = np.sqrt(6.0 / (self.input_shape + self.units))
+            
+            # weight for phases
+            self.Uf = self.__randomU()
+            self.Ui = self.__randomU()
+            self.Uc = self.__randomU()
+            self.Uo = self.__randomU()
+            
+            # recurrent weights for phases
+            self.Wf = self.__randomW()
+            self.Wi = self.__randomW()
+            self.Wc = self.__randomW()
+            self.Wo = self.__randomW()
 
-        # biases for phases
-        self.Bf = self.__randomB()
-        self.Bi = self.__randomB()
-        self.Bc = self.__randomB()
-        self.Bo = self.__randomB()
+            # biases for phases
+            self.Bf = self.__randomB()
+            self.Bi = self.__randomB()
+            self.Bc = self.__randomB()
+            self.Bo = self.__randomB()
     
     def getOutput(self):
         return self.output

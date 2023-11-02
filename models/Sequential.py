@@ -104,7 +104,7 @@ class Sequential():
                 lstmLayer.setWeight(params["Uf"], params["Ui"], params["Uc"], params["Uo"])
                 lstmLayer.setRecurrentWeight(params["Wf"], params["Wi"], params["Wc"], params["Wo"])
                 lstmLayer.setBias(params["Bf"], params["Bi"], params["Bc"], params["Bo"])
-                self.add(lstmLayer)
+                self.add(lstmLayer, True)
             
             # Add dense layer
             elif layer_type == "dense":
@@ -132,9 +132,9 @@ class Sequential():
     def getOutput(self):
         return self.output
 
-    def add(self, layer):
+    def add(self, layer, isLoad = False):
         if (self.__isLSTM(layer)):
-            layer.setInput(self.input)
+            layer.setInput(self.input, isLoad=isLoad)
         else:
             layer.setInputSize(self.layers[-1].getOutputShape()[1])
 
